@@ -27,7 +27,18 @@ function showError( message, element ) {
  */
 function populateSheets( showHideStates ) {
   console.log(showHideStates);
-  var list = '<ol></ol>';
+  var list = $('<ol></ol>');
+
+  var listItems = showHideStates.map(function(sheet){
+
+    var li = $('li');
+
+    $(li).html(sheet.name).prop('locked',sheet.protected.sheet || sheet.protected.range);
+
+    return li;
+
+  }).join('');
+
   $('sheetlist').html(list);
 }
 
