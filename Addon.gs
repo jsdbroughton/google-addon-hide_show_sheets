@@ -21,7 +21,7 @@ function onInstall() {
 function onOpen( e ) {
   SpreadsheetApp.getUi()
     .createAddonMenu()
-    .addItem( 'Start', 'showSidebar' )
+    .addItem( 'Manage Sheets', 'showSidebar' )
     .addToUi();
 }
 
@@ -32,7 +32,13 @@ function showSidebar() {
   var ui = HtmlService.createTemplateFromFile( 'Sidebar' )
     .evaluate()
     .setSandboxMode( HtmlService.SandboxMode.IFRAME )
-    .setTitle( 'Translate' );
+    .setTitle( 'Sheet Manager' );
   SpreadsheetApp.getUi()
     .showSidebar( ui );
+}
+
+// Helper function that puts external JS / CSS into the HTML file.
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+      .getContent();
 }
