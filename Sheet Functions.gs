@@ -33,7 +33,24 @@ SheetManager.getShowHideStates = function() {
 
 SheetManager.protectionFilter = function(protection) { // var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE)[0];
   // Only return those sheets that are not editable by the current user or have ranges not editable by the current user.
-  return protection.canEdit();
+  return !protection.canEdit();
+}
+
+SheetManager.toggleSheet = function(name, index) {
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  var sheet = ss.getSheetByName(name);
+  
+  if (sheet.isSheetHidden()) {
+    
+    sheet.showSheet();
+    return 'shown';
+  } else {
+  sheet.hideSheet();
+  return 'hidden';
+  
+  }
 }
 
 function testGetShowHideState() {

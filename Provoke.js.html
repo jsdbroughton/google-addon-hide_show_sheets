@@ -13,7 +13,7 @@ var Provoke =(function (ns) {
   * @param {[...]} the args
   * @return {Promise} a promise
   */
-  ns.run = function (namespace,method) {
+  ns.run = function (namespace, method) {
     
     // the args to the server function
     var runArgs = Array.prototype.slice.call(arguments).slice(2);
@@ -35,7 +35,7 @@ var Provoke =(function (ns) {
         resolve (result);
       })
     
-      .exposeRun (namespace,method,runArgs); 
+      .exposeRun (namespace, method, runArgs); 
     });
     
     

@@ -49,9 +49,10 @@ function include(filename) {
 * @param {method} method name
 */
 function exposeRun (namespace, method , argArray ) {
+  
   var func = (namespace ? this[namespace][method] : this[method])
   if (argArray && argArray.length) {
-    return func.apply(this,argArray);
+    return func.apply(this, argArray);
   }
   else {
     return func();

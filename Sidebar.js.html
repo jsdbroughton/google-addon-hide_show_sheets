@@ -5,8 +5,10 @@ var SheetManagerClient = ( function ( namespace ) {
   var sm = namespace; // namespace
 
   sm.settings = {
-    serverPollInterval: 15000;
+    serverPollInterval: 5000
   };
+  
+  sm.volatile = {};
 
   /**
    * Inserts a div that contains an error message after a given element.
@@ -15,7 +17,6 @@ var SheetManagerClient = ( function ( namespace ) {
    * @param element The element after which to display the error.
    */
   sm.showError = function ( message, element ) {
-    console.log( message );
     var div = $( '.errorFeedback' )
       .text( message );
   };
@@ -37,14 +38,14 @@ var SheetManagerClient = ( function ( namespace ) {
         .attr( 'data-locked', sheet.protections.length > 0 );
       $( listItem )
         .attr( 'data-hidden', sheet.hidden );
-
+        
       var hiddenState = $( '<span class="hiddenState"><i class="zmdi zmdi-hc-fw" /></span' )
       $( hiddenState )
         .find( 'i' )
-        .toggleClass( 'zmdi-eye-off', sheet.hidden );
+        .toggleClass( 'zmdi-eye-off', !sheet.hidden );
       $( hiddenState )
         .find( 'i' )
-        .toggleClass( 'zmdi-eye', !sheet.hidden );
+        .toggleClass( 'zmdi-eye', sheet.hidden );
       $( listItem )
         .append( hiddenState );
 
@@ -70,7 +71,7 @@ var SheetManagerClient = ( function ( namespace ) {
     }, list );
 
     $( '.sheetList' )
-      .append( listItems );
+      .html( listItems );
 
 
   };
@@ -80,13 +81,19 @@ var SheetManagerClient = ( function ( namespace ) {
 
     return Provoke.run( "SheetManager", "getShowHideStates" )
       .then( function ( result ) {
+        SheetManagerClient.volatile.visibleSheets = result.reduce(function(visibleCount, sheet){
+          return (sheet.hidden === false) ? visibleCount += 1 : visibleCount;
+        }, 0)
+        
         SheetManagerClient.populateSheets( result );
-      } )[ 'catch' ]( function ( err ) {
-        SheetManagerClient.showError( "Error getting sheets", err );
+        SheetManagerClient.showError( "" );
+      } )
+      .catch( function ( err ) {
+        SheetManagerClient.showError( err || "Error getting sheets");
       } );
   };
 
-  sm.looping = function () {
+  sm.loop = function () {
     loopSheetStatuses();
 
     function loopSheetStatuses() {
@@ -101,6 +108,8 @@ var SheetManagerClient = ( function ( namespace ) {
 }( SheetManagerClient || {} ) );
 
 </script>
+
+
 <script>
 /**
  * On document load, assign click handlers to each button and try to load the, populate sheets list
@@ -109,7 +118,30 @@ $( function () {
 
   $( '.sheetList' )
     .on( 'click', '.hiddenState', function () {
-      console.log( this );
+    
+      var li = $(this).parent();
+      
+      var locked = $(li).attr('data-locked') === 'true';
+      var hidden = $(li).attr('data-hidden') === 'true';
+      var name = $(li).find('.sheetname').text();
+      var index = $(li).index() + 1;
+          
+      if (!hidden && SheetManagerClient.volatile.visibleSheets <= 1) {
+        SheetManagerClient.showError("Cannot hide last visible sheet");
+      } else {
+        $(li).find('.hiddenState i').toggleClass( 'zmdi-eye-off').toggleClass( 'zmdi-eye')
+        $(li).attr('data-hidden', $(li).attr('data-hidden') === 'false')
+        Provoke.run( "SheetManager", "toggleSheet", name, index)
+        .then ( function( result ) {
+
+          
+
+        } )
+        .catch( function ( err ) {
+          SheetManagerClient.showError( err || "Error toggling sheet");
+        } );
+      }
+      
     } );
   $( '.sheetList' )
     .on( 'click', '.lockedState', function () {
@@ -120,9 +152,9 @@ $( function () {
       console.log( this );
     } );
 
-  //    console.log(SheetManagerClient.settings.serverPollInterval);
+    console.log('Polling at ' + SheetManagerClient.settings.serverPollInterval / 1000 + ' seconds');
 
-  //    SheetManagerClient.looping();
+    SheetManagerClient.loop();
 } );
 
 </script>
