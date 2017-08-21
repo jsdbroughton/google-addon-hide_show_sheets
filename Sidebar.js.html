@@ -8,7 +8,7 @@ var SheetManagerClient = (function (namespace) {
     var sm = namespace;
 
     sm.settings = {
-        serverPollInterval: 5000
+        serverPollInterval: 2500
     };
 
     /**
@@ -108,11 +108,15 @@ var SheetManagerClient = (function (namespace) {
     sm.loop = function () {
 
         function loopSheetStatuses() {
+        
             Promise.all([sm.getSheetsInBook(), Provoke.loiter(sm.settings.serverPollInterval)])
                 .then(function () {
-                    loopSheetStatuses();
+                    if (!sm.volatile.interrupt) {
+                      loopSheetStatuses();
+                    }
                 });
-        }
+            }
+        
         loopSheetStatuses();
     };
 
@@ -128,8 +132,9 @@ $(function () {
         .on('click', '.hiddenState', function (e) {
 
             var li, hidden, name, index;
-            li = $(e.target)
-                .parent();
+            
+            li = $(e.currentTarget)
+                .parent('li');
 
             hidden = $(li)
                 .attr('data-hidden') === 'true';
@@ -142,15 +147,16 @@ $(function () {
             if (!hidden && SheetManagerClient.volatile.visibleSheets <= 1) {
                 SheetManagerClient.showError('Cannot hide last visible sheet');
             } else {
-                $(li)
-                    .find('.hiddenState i')
-                    .toggleClass('zmdi-eye-off')
-                    .toggleClass('zmdi-eye');
-                $(li)
-                    .attr('data-hidden', $(li)
-                        .attr('data-hidden') === 'false');
+            
+                SheetManagerClient.volatile.interrupt = true;
+                          
                 Provoke.run('SheetManager', 'toggleSheet', name, index)
-                    .then(SheetManagerClient.showError(''))
+                    .then(function(result) {
+                      SheetManagerClient.showError('');
+                      SheetManagerClient.populateSheets(result)
+                      SheetManagerClient.volatile.interrupt = false;
+                      SheetManagerClient.loop();
+                    })
                     .catch(function (err) {
                         SheetManagerClient.showError(err || 'Error toggling sheet');
                     });

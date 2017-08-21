@@ -56,12 +56,12 @@ SheetManager.toggleSheet = function ( name, index ) {
   if ( sheet.isSheetHidden() ) {
 
     sheet.showSheet();
-    return 'shown';
   } else {
     sheet.hideSheet();
-    return 'hidden';
 
   }
+  
+  return SheetManager.getShowHideStates();
 }
 
 function testGetShowHideState() {
