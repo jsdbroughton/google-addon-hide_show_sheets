@@ -4,7 +4,7 @@
  * On document load, assign click handlers to each button and try to load the, populate sheets list
  */
 $( function () {
-  google.script.run.withSuccessHandler( loadPreferences )
+  google.script.run
     .withSuccessHandler( populateSheets )
     .withFailureHandler( showError )
     .getShowHideStates();
@@ -17,6 +17,7 @@ $( function () {
  * @param element The element after which to display the error.
  */
 function showError( message, element ) {
+  console.log(message);
   var div = $( '.errorFeedback' )
     .text( message );
 }
@@ -25,6 +26,7 @@ function showError( message, element ) {
  * Populates the sheetlist div with an ordered list of the sheets with management functions
  */
 function populateSheets( showHideStates ) {
+  console.log(showHideStates);
   var list = $('<ol></ol>');
   $('sheetlist').html(list);
 }
