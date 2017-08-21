@@ -1,13 +1,17 @@
+/*global SheetManager, SpreadsheetApp */
+/*jslint white:true */
+/*eslint indent: "error"*/
+
 /*
  * Returns an array of sheet objects with the hidden status of each.
  */
 SheetManager.getShowHideStates = function () {
 
   var ss = SpreadsheetApp.getActiveSpreadsheet(),
-    sheets = ss.getSheets(),
+        sheets = ss.getSheets(),
     sheetStatus = [];
 
-  sheetStatus = sheets.map( function ( sheet, i, arr ) {
+  sheetStatus = sheets.map( function ( sheet ) {
     // var sheet = ss.getSheets()[0];
 
     var protections = [ {
