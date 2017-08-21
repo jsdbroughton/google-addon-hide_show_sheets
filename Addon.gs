@@ -18,18 +18,21 @@ function onInstall() {
  *     determine which authorization mode (ScriptApp.AuthMode) the trigger is
  *     running in, inspect e.authMode.
  */
-function onOpen(e) {
-  DocumentApp.getUi().createAddonMenu()
-      .addItem('Start', 'showSidebar')
-      .addToUi();
+function onOpen( e ) {
+  DocumentApp.getUi()
+    .createAddonMenu()
+    .addItem( 'Start', 'showSidebar' )
+    .addToUi();
 }
 
 /**
  * Opens a sidebar in the document containing the add-on's user interface.
  */
 function showSidebar() {
-  var ui = HtmlService.createTemplateFromFile('Sidebar').evaluate()
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setTitle('Translate');
-  DocumentApp.getUi().showSidebar(ui);
+  var ui = HtmlService.createTemplateFromFile( 'Sidebar' )
+    .evaluate()
+    .setSandboxMode( HtmlService.SandboxMode.IFRAME )
+    .setTitle( 'Translate' );
+  DocumentApp.getUi()
+    .showSidebar( ui );
 }
