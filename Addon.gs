@@ -19,7 +19,7 @@ function onInstall() {
  *     running in, inspect e.authMode.
  */
 function onOpen( e ) {
-  DocumentApp.getUi()
+  SpreadsheetApp.getUi()
     .createAddonMenu()
     .addItem( 'Start', 'showSidebar' )
     .addToUi();
@@ -33,6 +33,6 @@ function showSidebar() {
     .evaluate()
     .setSandboxMode( HtmlService.SandboxMode.IFRAME )
     .setTitle( 'Translate' );
-  DocumentApp.getUi()
+  SpreadsheetApp.getUi()
     .showSidebar( ui );
 }
