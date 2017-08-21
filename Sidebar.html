@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <base target="_top">
-    <?!= include('Sidebar.css.html'); ?>
+          <base target="_top">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+          <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+          <?!= include('Sidebar.css.html'); ?>
 
   </head>
   <body>
-
-    <div class="sheetList"></div>
-
-
-    <div class="errorFeedback"></div>
-
-    <?!= include('Libraries.js.html'); ?>
-    <?!= include('Vanilla.js.html'); ?>
-    <?!= include('Provoke.js.min.html'); ?>
-    <?!= include('Sidebar.js.html'); ?>
+          <div class="sheetList"></div>
+          <div class="errorFeedback"></div>
+          <?!= include( 'Libraries.js.html' ); ?>
+          <?!= include( 'Vanilla.js.html' ); ?>
+          <?!= include( 'Provoke.js.min.html' ); ?>
+          <?!= include( 'Sidebar.js.html' ); ?>
   </body>
 </html>
-
-

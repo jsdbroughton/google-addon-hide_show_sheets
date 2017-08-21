@@ -2,12 +2,15 @@
 var SheetManagerClient = ( function ( namespace ) {
   'use strict';
 
-  var sm = namespace; // namespace
+  var sm = namespace;
 
   sm.settings = {
-    serverPollInterval: 5000
+    serverPollInterval: 5000;
   };
-  
+
+  /**
+   * Placeholder for in memory values
+   */
   sm.volatile = {};
 
   /**
@@ -30,15 +33,18 @@ var SheetManagerClient = ( function ( namespace ) {
 
     var listItems = showHideStates.reduce( function ( list, sheet ) {
 
+      // Each <li> per sheet.
       var listItem = $( '<li></li>' );
-
       $( listItem )
         .html( '<span class="sheetname">' + sheet.name + '</span>' );
+
+      // html5 data-* attributes
       $( listItem )
         .attr( 'data-locked', sheet.protections.length > 0 );
       $( listItem )
         .attr( 'data-hidden', sheet.hidden );
-        
+
+      // add toggle hidden state button
       var hiddenState = $( '<span class="hiddenState"><i class="zmdi zmdi-hc-fw" /></span' )
       $( hiddenState )
         .find( 'i' )
@@ -49,6 +55,14 @@ var SheetManagerClient = ( function ( namespace ) {
       $( listItem )
         .append( hiddenState );
 
+      // add view locked hidden state icon
+      var deleteSheet = $( '<span class="deleteSheet"><i class="zmdi zmdi-hc-fw zmdi-delete" /></span>' );
+      $( listItem )
+        .append( deleteSheet );
+      $( list )
+        .append( listItem );
+
+      // add view locked hidden state icon
       var lockedState = $( '<span class="lockedState"><i class="zmdi zmdi-hc-fw" /></span' )
       $( lockedState )
         .find( 'i' )
@@ -59,12 +73,6 @@ var SheetManagerClient = ( function ( namespace ) {
       $( listItem )
         .append( lockedState );
 
-      var deleteSheet = $( '<span class="deleteSheet"><i class="zmdi zmdi-hc-fw zmdi-delete" /></span>' );
-      $( listItem )
-        .append( deleteSheet );
-
-      $( list )
-        .append( listItem );
 
       return list;
 
@@ -81,15 +89,15 @@ var SheetManagerClient = ( function ( namespace ) {
 
     return Provoke.run( "SheetManager", "getShowHideStates" )
       .then( function ( result ) {
-        SheetManagerClient.volatile.visibleSheets = result.reduce(function(visibleCount, sheet){
-          return (sheet.hidden === false) ? visibleCount += 1 : visibleCount;
-        }, 0)
-        
+        SheetManagerClient.volatile.visibleSheets = result.reduce( function ( visibleCount, sheet ) {
+          return ( sheet.hidden === false ) ? visibleCount += 1 : visibleCount;
+        }, 0 )
+
         SheetManagerClient.populateSheets( result );
         SheetManagerClient.showError( "" );
       } )
       .catch( function ( err ) {
-        SheetManagerClient.showError( err || "Error getting sheets");
+        SheetManagerClient.showError( err || "Error getting sheets" );
       } );
   };
 
@@ -107,10 +115,6 @@ var SheetManagerClient = ( function ( namespace ) {
   return sm;
 }( SheetManagerClient || {} ) );
 
-</script>
-
-
-<script>
 /**
  * On document load, assign click handlers to each button and try to load the, populate sheets list
  */
@@ -118,43 +122,46 @@ $( function () {
 
   $( '.sheetList' )
     .on( 'click', '.hiddenState', function () {
-    
-      var li = $(this).parent();
-      
-      var locked = $(li).attr('data-locked') === 'true';
-      var hidden = $(li).attr('data-hidden') === 'true';
-      var name = $(li).find('.sheetname').text();
-      var index = $(li).index() + 1;
-          
-      if (!hidden && SheetManagerClient.volatile.visibleSheets <= 1) {
-        SheetManagerClient.showError("Cannot hide last visible sheet");
+
+      var li = $( this )
+        .parent();
+
+      var locked = $( li )
+        .attr( 'data-locked' ) === 'true';
+      var hidden = $( li )
+        .attr( 'data-hidden' ) === 'true';
+      var name = $( li )
+        .find( '.sheetname' )
+        .text();
+      var index = $( li )
+        .index() + 1;
+
+      if ( !hidden && SheetManagerClient.volatile.visibleSheets <= 1 ) {
+        SheetManagerClient.showError( "Cannot hide last visible sheet" );
       } else {
-        $(li).find('.hiddenState i').toggleClass( 'zmdi-eye-off').toggleClass( 'zmdi-eye')
-        $(li).attr('data-hidden', $(li).attr('data-hidden') === 'false')
-        Provoke.run( "SheetManager", "toggleSheet", name, index)
-        .then ( function( result ) {
-
-          
-
-        } )
-        .catch( function ( err ) {
-          SheetManagerClient.showError( err || "Error toggling sheet");
-        } );
+        $( li )
+          .find( '.hiddenState i' )
+          .toggleClass( 'zmdi-eye-off' )
+          .toggleClass( 'zmdi-eye' )
+        $( li )
+          .attr( 'data-hidden', $( li )
+            .attr( 'data-hidden' ) === 'false' )
+        Provoke.run( "SheetManager", "toggleSheet", name, index )
+          .then( showError( "" ) )
+          .catch( function ( err ) {
+            SheetManagerClient.showError( err || "Error toggling sheet" );
+          } );
       }
-      
     } );
-  $( '.sheetList' )
-    .on( 'click', '.lockedState', function () {
-      console.log( this );
-    } );
+
   $( '.sheetList' )
     .on( 'click', '.deleteSheet', function () {
       console.log( this );
     } );
 
-    console.log('Polling at ' + SheetManagerClient.settings.serverPollInterval / 1000 + ' seconds');
+  console.log( 'Polling at ' + SheetManagerClient.settings.serverPollInterval / 1000 + ' seconds' );
 
-    SheetManagerClient.loop();
+  SheetManagerClient.loop();
 } );
 
 </script>
