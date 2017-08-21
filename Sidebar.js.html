@@ -1,3 +1,32 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
+/**
+ * On document load, assign click handlers to each button and try to load the, populate sheets list
+ */
+$( function () {
+  google.script.run.withSuccessHandler( loadPreferences )
+    .withSuccessHandler( populateSheets )
+    .withFailureHandler( showError )
+    .getShowHideStates();
+} );
+
+/**
+ * Inserts a div that contains an error message after a given element.
+ *
+ * @param msg The error message to display.
+ * @param element The element after which to display the error.
+ */
+function showError( message, element ) {
+  var div = $( '.errorFeedback' )
+    .text( message );
+}
+
+/**
+ * Populates the sheetlist div with an ordered list of the sheets with management functions
+ */
+function populateSheets( showHideStates ) {
+  var list = $('<ol></ol>');
+  $('sheetlist').html(list);
+}
+
 </script>
