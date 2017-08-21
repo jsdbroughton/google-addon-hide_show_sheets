@@ -1,5 +1,40 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+
 <style>
+.hiddenState, .lockedState, .deleteSheet {
+  display: inline-block;
+  cursor: pointer;
+  padding-left: 1em;
+}
 
+[data-locked="true"] .deleteSheet, [data-hidden="true"] .hiddenState, [data-locked="false"] .lockedState {
+  opacity: 0.5;
+}
 
+.sheetname {
+  max-width: 50%;
+  width: 50%;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheetList ol {
+  list-style: none;
+}
+
+.sheetList li {
+  display: block;
+  line-height: 1.5em;
+  height: 1.5em;
+}
+
+.sheetList li span {
+  display: inline-block;
+  line-height: 1.5em;
+  height: 1.5em;
+  overflow-x: hidden;
+}
 </style>

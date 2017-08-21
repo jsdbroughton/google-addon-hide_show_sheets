@@ -1,31 +1,43 @@
 /*
- * Returns an array of sheet objects with the hidden status of each.
- */
-function getShowHideStates() {
-
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+* Returns an array of sheet objects with the hidden status of each.
+*/
+SheetManager.getShowHideStates = function() {
   
-  var sheets = ss.getSheets();
+  var ss = SpreadsheetApp.getActiveSpreadsheet(),
+      sheets = ss.getSheets(),
+      sheetStatus = [];
   
-  var sheetStatus = sheets.map(function(sheet, i, arr) {
+  sheetStatus = sheets.map(function(sheet, i, arr) {
     // var sheet = ss.getSheets()[0];
-  
-    return {
+    
+    var protections = [
+      { type:'Sheet', scope: (sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET) || []).filter(SheetManager.protectionFilter)},
+      { type: 'Range', scope: sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).filter(SheetManager.protectionFilter)}
+    ].reduce(function(protections, p) {     
+      if (p.scope.length > 0) { protections.push(p.type); }
+      return protections;
+    },[]);
+    
+    var sheetObject = {
       "name": sheet.getName(),
       "hidden": sheet.isSheetHidden(),
-      "protected": {
-        "sheet": (sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET) || []).filter(function(protection) { // var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)[0];
-          
-          // Only return those sheets that are not editable by the current user.
-          return !protection.canEdit();
-        }).length > 0,
-        "ranges": (sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE) || []).filter(function(protection) { // var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE)[0];
-          return !protection.canEdit();
-        }).length > 0
-      },
+      "protections": protections,
       "id": sheet.getIndex()
-    }
+    };
+    
+    return sheetObject;
   });
   
   return sheetStatus;
+}
+
+SheetManager.protectionFilter = function(protection) { // var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE)[0];
+  // Only return those sheets that are not editable by the current user or have ranges not editable by the current user.
+  return protection.canEdit();
+}
+
+function testGetShowHideState() {
+  
+  var list = SheetManager.getShowHideStates();  
+  debugger;
 }
