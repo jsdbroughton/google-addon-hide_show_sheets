@@ -1,14 +1,12 @@
 <style>
 body {
-  padding: 1em;
+  padding: 1em 0.25em;
+  font-size: 1.25em;
 }
 
 .hiddenState,
-.lockedState,
 .deleteSheet {
-  display: inline-block;
   cursor: pointer;
-  padding-left: 1em;
 }
 
 [data-locked="true"] .deleteSheet,
@@ -17,7 +15,8 @@ body {
   opacity: 0.5;
 }
 
-.sheetList li span:not(.lockedState) {
+.sheetList li span {
+  padding-left: 1em;
   display: inline-block;
   line-height: 1.5em;
   height: 1.5em;
@@ -25,8 +24,8 @@ body {
 }
 
 .sheetList li .sheetname {
-  max-width: 50%;
-  width: 50%;
+  max-width: 40%;
+  width: 40%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
