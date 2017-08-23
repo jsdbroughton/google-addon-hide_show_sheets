@@ -89,6 +89,7 @@ var SheetManagerClient = (function (namespace) {
 
         return Provoke.run('SheetManager', 'getShowHideStates')
             .then(function (result) {
+                sm.volatile.totalSheets = result.length;
                 sm.volatile.visibleSheets = result.reduce(function (visibleCount, sheet) {
 
                     if (sheet.hidden === false) {
@@ -120,6 +121,78 @@ var SheetManagerClient = (function (namespace) {
         loopSheetStatuses();
     };
 
+    sm.deleteSheet = function(event) {
+      
+      var li, locked, name, index;
+      
+      li = $(event.currentTarget)
+        .parent('li');
+
+      locked = $(li)
+        .attr('data-locked') === 'true';
+      name = $(li)
+        .find('.sheetname')
+        .text();
+      index = $(li)
+        .index() + 1;
+        
+      if(sm.volatile.totalSheets <= 1) {
+        sm.showError('Cannot delete last sheet in the workbook.');
+        return false;
+      }
+      
+      if (locked) {
+        sm.showError('You do not have full edit rights to the sheet: ' + name);
+        return false;
+      }
+      
+      sm.volatile.interrupt = true;
+      
+      Provoke.run('SheetManager', 'deleteSheet', name, index)
+      .then(function(result) {
+        sm.showError('');
+        sm.populateSheets(result);
+        sm.volatile.interrupt = false;
+        sm.loop();
+      })
+      .catch(sm.showError);
+      
+      return;
+    }
+    
+    sm.toggleSheet = function(event) {
+      var li, hidden, name, index;
+      
+      li = $(event.currentTarget)
+        .parent('li');
+      
+      hidden = $(li)
+        .attr('data-hidden') === 'true';
+      name = $(li)
+        .find('.sheetname')
+        .text();
+      index = $(li)
+        .index() + 1;
+      
+      if (!hidden && sm.volatile.visibleSheets <= 1) {
+        sm.showError('Cannot hide last visible sheet');
+        return false;
+      }  
+        
+      sm.volatile.interrupt = true;
+      
+      Provoke.run('SheetManager', 'toggleSheet', name, index)
+      .then(function(result) {
+        sm.showError('');
+        sm.populateSheets(result);
+        sm.volatile.interrupt = false;
+        sm.loop();
+      })
+      .catch(sm.showError);
+      
+      return;
+    }
+
     return sm;
 }({}));
 
@@ -129,44 +202,10 @@ var SheetManagerClient = (function (namespace) {
 $(function () {
     'use strict';
     $('.sheetList')
-        .on('click', '.hiddenState', function (e) {
-
-            var li, hidden, name, index;
-            
-            li = $(e.currentTarget)
-                .parent('li');
-
-            hidden = $(li)
-                .attr('data-hidden') === 'true';
-            name = $(li)
-                .find('.sheetname')
-                .text();
-            index = $(li)
-                .index() + 1;
-
-            if (!hidden && SheetManagerClient.volatile.visibleSheets <= 1) {
-                SheetManagerClient.showError('Cannot hide last visible sheet');
-            } else {
-            
-                SheetManagerClient.volatile.interrupt = true;
-                          
-                Provoke.run('SheetManager', 'toggleSheet', name, index)
-                    .then(function(result) {
-                      SheetManagerClient.showError('');
-                      SheetManagerClient.populateSheets(result)
-                      SheetManagerClient.volatile.interrupt = false;
-                      SheetManagerClient.loop();
-                    })
-                    .catch(function (err) {
-                        SheetManagerClient.showError(err || 'Error toggling sheet');
-                    });
-            }
-        });
+        .on('click', '.hiddenState', SheetManagerClient.toggleSheet);
 
     $('.sheetList')
-        .on('click', '.deleteSheet', function (e) {
-            console.log(e.target);
-        });
+        .on('click', '.deleteSheet', SheetManagerClient.deleteSheet);
 
     console.log('Polling at ' + SheetManagerClient.settings.serverPollInterval / 1000 + ' seconds');
 

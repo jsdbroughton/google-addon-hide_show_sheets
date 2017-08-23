@@ -47,6 +47,40 @@ SheetManager.protectionFilter = function ( protection ) { // var protection = sh
   return !protection.canEdit();
 }
 
+SheetManager.deleteSheet = function ( name, index ) {
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  var sheet = ss.getSheetByName( name );
+
+  var protections = [ {
+    type: 'Sheet',
+    scope: ( sheet.getProtections( SpreadsheetApp.ProtectionType.SHEET ) || [] )
+      .filter( SheetManager.protectionFilter )
+  }, {
+    type: 'Range',
+    scope: sheet.getProtections( SpreadsheetApp.ProtectionType.RANGE )
+      .filter( SheetManager.protectionFilter )
+  } ].reduce( function ( protections, p ) {
+    if ( p.scope.length > 0 ) {
+      protections.push( p.type );
+    }
+    return protections;
+  }, [] );
+  
+  if ( protections.indexOf('Sheet') >= 0 ) {
+    throw ('Sheet is protected');
+  }
+  
+  if ( protections.indexOf('Range') >= 0 ) {
+    throw ('Sheet contains protected ranges');
+  }
+  
+  ss.deleteSheet(sheet);  
+  
+  return SheetManager.getShowHideStates();
+}
+
 SheetManager.toggleSheet = function ( name, index ) {
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
